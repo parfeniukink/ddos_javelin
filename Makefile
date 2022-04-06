@@ -4,7 +4,7 @@ ISORT_COMMAND = isort ./
 
 .PHONY: run
 run:
-	sudo python src/run.py 62.173.139.141 443
+	sudo python src/run.py
 
 .PHONY: code_quality
 code_quality:
