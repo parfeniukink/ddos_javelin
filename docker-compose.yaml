@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  ddos:
+    build:
+      context: .
+    image: ddos_javelin
+    container_name: ddos_javelin

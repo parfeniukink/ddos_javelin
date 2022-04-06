@@ -13,6 +13,7 @@ scapy = "2.4.5"
 flake8 = "^4.0.1"
 black = "^22.3.0"
 isort = "^5.10.1"
+ipdb = "^0.13.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -35,9 +36,20 @@ target-version = ['py39']
 line-length = 120
 exclude = '''
 (
-    \.venv
-    \venv
-    \env
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.__pycache__
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+                     # the root of the project
 )
 '''
 
