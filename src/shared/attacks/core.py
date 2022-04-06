@@ -29,8 +29,9 @@ class Attack(Protocol):
 
 
 class BaseService:
-    _counter = 0
-    _fails = 0
+    def __init__(self) -> None:
+        self._counter = 0
+        self._fails = 0
 
     def get_socket(self, target: Target) -> socket.socket:
         sock = socket.socket()

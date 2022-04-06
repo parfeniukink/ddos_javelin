@@ -1,4 +1,5 @@
 import random
+from typing import Optional
 
 from constants import REFERERS_FILENAME, USER_AGENTS_FILENAME
 from shared.files import get_file_lines
@@ -7,6 +8,7 @@ from shared.files import get_file_lines
 class Random:
     referers = get_file_lines(REFERERS_FILENAME)
     user_agents = get_file_lines(USER_AGENTS_FILENAME)
+    cached_byte_payload: Optional[bytes] = None
 
     @staticmethod
     def get_ip() -> str:
@@ -23,3 +25,13 @@ class Random:
     @classmethod
     def get_user_agent(cls) -> str:
         return random.choice(cls.user_agents)
+
+    @classmethod
+    def get_bytes(cls, n: int = 60_000) -> bytes:
+        if cls.cached_byte_payload:
+            return cls.cached_byte_payload
+
+        if n < 1:
+            raise ValueError("`n` must be more than 1")
+
+        return b"\x00" * n

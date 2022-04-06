@@ -9,6 +9,11 @@ class HTTPSchemas(Enum):
     HTTPS = "https"
 
 
+class HTTPMethods(Enum):
+    GET = "GET"
+    POST = "POST"
+
+
 @dataclass(frozen=True)
 class HttpAddress(Model):
     target: Target

