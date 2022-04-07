@@ -1,9 +1,7 @@
-from typing import Optional
+from typing import Optional, Union
 
-from constants import CRLF
 from shared.attacks import AttackRequest
 from shared.attacks.core import BaseService
-from shared.attacks.http import HttpAddress, HTTPMethods
 from shared.randoms import Random
 
 
@@ -12,60 +10,49 @@ class HttpService(BaseService):
         super().__init__()
         self._attack_request = attack_request
         self.__duplicates_headers_counter = 0
-        self.__duplicates_random_data_counter = 0
-        self.__cached_headers: Optional[bytes] = None
-        self.__cached_random_data: Optional[bytes] = None
-
-    def send(self) -> None:
-        pass
-
-    def __get_headers(self) -> str:
-        return CRLF.join(
-            (
-                r"X-Requested-With: XMLHttpRequest",
-                r"Connection: keep-alive",
-                r"Pragma: no-cache",
-                r"Cache-Control: no-cache",
-                r"Accept-Encoding: gzip, deflate, br",
-                rf"User-agent: {Random.get_user_agent()}",
-            )
-        )
-
-    def _get_random_headers(self, http_method: HTTPMethods) -> bytes:
-        if not isinstance(self._attack_request.address, HttpAddress):
-            raise Exception("You can use only HttpAddress with this attack")
-
-        address: HttpAddress = self._attack_request.address
-        headers: str = self.__get_headers()
-
-        data = CRLF.join(
-            (
-                rf"{http_method.value} {address.path} HTTP/1.1",
-                rf"Host: {address.target.ip}",
-                headers,
-                rf"Connection: Close{CRLF}{CRLF}",
-            )
-        )
-
-        return data.encode()
-
-    def _get_http_headers(self, method: HTTPMethods = HTTPMethods.GET) -> bytes:
-        if self.__duplicates_headers_counter % 1_000 == 0:
-            self.__cached_headers = None
-
-        self.__duplicates_headers_counter += 1
-
-        return self.__cached_headers or self._get_random_headers(method)
+        self.__cached_headers: Optional[dict] = None
+        self.__duplicates_http_payloads = 0
+        self.__cached_http_payload: Optional[dict] = None
 
     @property
-    def _random_data(self) -> bytes:
-        if self.__duplicates_random_data_counter % 1_000 == 0:
-            self.__cached_random_data = None
+    def _random_headers(self) -> dict:
+        return {
+            "connection": "keep-alive",
+            "pragma": "no-cache",
+            "cache-control": "no-cache",
+            "accept-encoding": "gzip, deflate, br",
+            "user-agent": f"{Random.get_user_agent()}",
+        }
 
+    @property
+    def http_headers(self) -> dict:
         self.__duplicates_headers_counter += 1
 
-        return self.__cached_random_data or Random.get_bytes()
+        if self.__duplicates_headers_counter % 500 == 0:
+            self.__cached_headers = None
 
-    def http_payload(self, method: HTTPMethods = HTTPMethods.GET) -> bytes:
-        """Change HTTP payload every 1000 packets"""
-        return self._get_http_headers(method) + self._random_data
+        if self.__cached_headers is None:
+            self.__cached_headers = self._random_headers
+
+        return self.__cached_headers
+
+    def _get_http_payload(self, data: Optional[Union[dict, list]]) -> dict:
+        if not data:
+            return {Random.get_random_string(10): Random.get_random_string(20) for _ in range(10)}
+
+        if isinstance(data, dict):
+            return data
+
+        return {field: Random.get_random_string(20) for field in data}
+
+    def get_http_payload(self, data: Optional[Union[dict, list]]) -> dict:
+        """Return random dict payload if received list of fields"""
+        self.__duplicates_http_payloads += 1
+
+        if self.__duplicates_http_payloads % 100 == 0:
+            self.__cached_http_payload = None
+
+        if self.__cached_http_payload is None:
+            self.__cached_http_payload = self._get_http_payload(data)
+
+        return self.__cached_http_payload

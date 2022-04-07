@@ -22,7 +22,6 @@ class AttackHandler:
             p.start()
         for p in pool:
             p.join()
-
         print("[+] Attack is done")
 
     # NOTE: Debugging

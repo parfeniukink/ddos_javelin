@@ -5,5 +5,5 @@ from shared.collections import Model
 
 @dataclass(frozen=True)
 class Target(Model):
-    ip: str
+    address: str
     port: int

@@ -1,21 +1,23 @@
 from dataclasses import dataclass
+from typing import Optional, Union
 
-from shared.attacks.targets import Target
 from shared.collections import Enum, Model
 
 
-class HTTPSchemas(Enum):
+class HttpSchemas(Enum):
     HTTP = "http"
     HTTPS = "https"
 
 
-class HTTPMethods(Enum):
+class HttpMethods(Enum):
     GET = "GET"
     POST = "POST"
+    HEAD = "HEAD"
 
 
 @dataclass(frozen=True)
-class HttpAddress(Model):
-    target: Target
-    schema: str = HTTPSchemas.HTTPS.value
+class HttpRequestMeta(Model):
+    schema: HttpSchemas = HttpSchemas.HTTPS
+    method: HttpMethods = HttpMethods.GET
     path: str = "/"
+    payload: Optional[Union[dict, list]] = None

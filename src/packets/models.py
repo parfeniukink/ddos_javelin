@@ -2,6 +2,6 @@ from shared.collections import IntEnum
 
 
 class PacketSizes(IntEnum):
-    LOW = 1_000
-    MEDIUM = 20_000
-    HIGHT = 65_490
+    LOW = 200
+    MEDIUM = 500
+    HIGH = 1010

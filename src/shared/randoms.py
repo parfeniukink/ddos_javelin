@@ -1,4 +1,5 @@
 import random
+import string
 from typing import Optional
 
 from constants import REFERERS_FILENAME, USER_AGENTS_FILENAME
@@ -27,7 +28,7 @@ class Random:
         return random.choice(cls.user_agents)
 
     @classmethod
-    def get_bytes(cls, n: int = 60_000) -> bytes:
+    def get_bytes(cls, n: int = 0) -> bytes:
         if cls.cached_byte_payload:
             return cls.cached_byte_payload
 
@@ -35,3 +36,7 @@ class Random:
             raise ValueError("`n` must be more than 1")
 
         return b"\x00" * n
+
+    @classmethod
+    def get_random_string(cls, n: int = 100) -> str:
+        return "".join((random.choice(string.ascii_letters) for _ in range(n)))

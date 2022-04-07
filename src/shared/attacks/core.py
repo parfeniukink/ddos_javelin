@@ -1,22 +1,24 @@
 import socket
 from dataclasses import dataclass
-from typing import Protocol, Union
+from typing import Optional, Protocol
 
 from packets.models import PacketSizes
-from shared.attacks.http import HttpAddress
+from shared.attacks.http import HttpRequestMeta
 from shared.attacks.targets import Target
 from shared.collections import Enum, Model
 
 
 class AttackTypes(Enum):
     HTTP = "HTTP"
+    SYN_FLOOD = "SYN_FLOOD"
 
 
 @dataclass(frozen=True)
 class AttackRequest(Model):
-    address: Union[HttpAddress, Target]
-    size: PacketSizes
-    attack_type: AttackTypes
+    target: Target
+    size: PacketSizes = PacketSizes.MEDIUM
+    attack_type: AttackTypes = AttackTypes.HTTP
+    http_meta: Optional[HttpRequestMeta] = None
 
 
 class Attack(Protocol):
