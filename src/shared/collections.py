@@ -5,20 +5,22 @@ from enum import unique
 from typing import Generator, Iterable
 
 
-class EnumMixin:
-    @classmethod
-    def values(cls: Iterable) -> Generator:
-        return (i.value for i in cls)
-
-
 @unique
 class Enum(_Enum):
-    pass
+    @classmethod
+    def values(cls: Iterable) -> list:
+        return [i.value for i in cls]
 
 
 @unique
 class IntEnum(_IntEnum):
-    pass
+    @classmethod
+    def values(cls: Iterable) -> list:
+        return [i.value for i in cls]
+
+    @classmethod
+    def names(cls: Iterable) -> list:
+        return [i.name for i in cls]
 
 
 @dataclass(frozen=True)

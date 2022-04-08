@@ -40,7 +40,7 @@ class HttpAttack:
                 payload = self._service.get_http_payload(self._http_meta.payload)
                 resp = make_request(host, payload, headers=self._service.http_headers)
                 requests_count += 1
-                if requests_count % 1_000 == 0:
+                if requests_count % 100 == 0:
                     requests_count = 0
                     print("[+] Checking bad status codes")
                     if resp.status_code in [HTTPStatus.TOO_MANY_REQUESTS]:

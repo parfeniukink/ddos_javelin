@@ -15,6 +15,7 @@ class AttackHandler:
         return HttpAttack(attack_request)
 
     def start(self) -> None:
+        print("[+] Attack started")
         pool = []
         for _ in range(self.cpu_count):
             p = Process(target=self._attack.run)
