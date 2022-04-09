@@ -27,7 +27,11 @@ class Attack(Protocol):
         ...
 
     def run(self) -> None:
-        """Create and return packet to send"""
+        """Run attack"""
+        ...
+
+    def run_debug(self) -> None:
+        """Run attack in debug mode"""
         ...
 
 
