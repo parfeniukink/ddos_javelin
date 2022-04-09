@@ -7,8 +7,7 @@ from shared.randoms import Random
 
 class HttpService(BaseService):
     def __init__(self, attack_request: AttackRequest) -> None:
-        super().__init__()
-        self._attack_request = attack_request
+        super().__init__(attack_request=attack_request)
         self.__duplicates_headers_counter = 0
         self.__cached_headers: Optional[dict] = None
         self.__duplicates_http_payloads = 0

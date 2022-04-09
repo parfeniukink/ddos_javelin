@@ -13,6 +13,7 @@ from packets.models import PacketSizes
 from shared.attacks.core import AttackTypes
 from shared.attacks.http import HttpMethods, HttpSchemas
 from shared.cli import Cli
+from shared.errors import UserError
 
 
 class CliParser:
@@ -99,24 +100,24 @@ class CliParser:
     def _validate_attack_type(self) -> AttackTypes:
         value = self.args.attack_type.upper()
         if value not in self._attack_types:
-            raise ValueError(f"Not allowed attack type - {self.args.attack_type}")
+            raise UserError(f"Not allowed attack type - {self.args.attack_type}")
 
         return getattr(AttackTypes, value)
 
     def _validate_address(self) -> str:
         value = self.args.address
         if not re.match(ADDRESS_REGEX, value):
-            raise ValueError(f"Not allowed attack type - {self.args.attack_type}")
+            raise UserError(f"Not allowed attack type - {self.args.attack_type}")
 
         return value
 
     def _validate_port(self) -> int:
         try:
             port: int = int(self.args.port)
-        except ValueError:
-            raise ValueError("Port should be a number")
+        except UserError:
+            raise UserError("Port should be a number")
         if MIN_PORT_NUMBER > port > MAX_PORT_NUMBER:
-            raise ValueError(f"You can use port in range between {MIN_PORT_NUMBER} and {MAX_PORT_NUMBER}")
+            raise UserError(f"You can use port in range between {MIN_PORT_NUMBER} and {MAX_PORT_NUMBER}")
         return port
 
     def _validate_size(self) -> Optional[PacketSizes]:
@@ -125,7 +126,7 @@ class CliParser:
 
         value = self.args.size.upper()
         if value not in self._packet_sizes:
-            raise ValueError(f"Not allowed packet size - {self.args.size}")
+            raise UserError(f"Not allowed packet size - {self.args.size}")
 
         return getattr(PacketSizes, value)
 
@@ -135,7 +136,7 @@ class CliParser:
 
         value = self.args.http_schema
         if value not in self._http_schemas:
-            raise ValueError(f"Not allowed HTTP schema - {value}")
+            raise UserError(f"Not allowed HTTP schema - {value}")
 
         return getattr(HttpSchemas, value.upper())
 
@@ -145,7 +146,7 @@ class CliParser:
 
         value = self.args.http_method.upper()
         if value not in self._http_methods:
-            raise ValueError(f"Not allowed HTTP method - {self.args.http_method}")
+            raise UserError(f"Not allowed HTTP method - {self.args.http_method}")
 
         return getattr(HttpMethods, value)
 
@@ -155,7 +156,7 @@ class CliParser:
         try:
             return json.loads(self.args.payload)
         except json.JSONDecodeError:
-            raise ValueError("Can not parse payload data. It shoulf be dict")
+            raise UserError("Can not parse payload data. It shoulf be dict")
 
     def validate_args(self) -> Cli:
         self.args: argparse.Namespace = self.parser.parse_args()

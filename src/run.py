@@ -4,8 +4,10 @@ from shared.attacks import AttackRequest, AttackTypes
 from shared.attacks.http import HttpRequestMeta
 from shared.attacks.targets import Target
 from shared.cli import Cli, get_dict_payload
+from shared.errors import user_error_handler
 
 
+@user_error_handler
 def main() -> None:
     parser = CliParser()
     parser.add_arguments()
