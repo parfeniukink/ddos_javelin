@@ -8,6 +8,7 @@ import requests
 from attacks.http.services import HttpService
 from constants import CONNECTION_TIMEOUT, THREADS_AMOUNT
 from shared.attacks import AttackRequest
+from shared.errors import UserError
 
 
 class HttpAttack:
@@ -20,11 +21,11 @@ class HttpAttack:
         if self._attack_request.http_meta:
             self._http_meta = self._attack_request.http_meta
         else:
-            raise ValueError("HTTP attack metadata should be specified")
+            raise UserError("HTTP attack metadata should be specified")
 
     def make_requests(self) -> Generator[requests.Response, None, None]:
         if self._attack_request.http_meta is None:
-            raise ValueError("HTTP attack metadata should be specified")
+            raise UserError("HTTP attack metadata should be specified")
 
         http_method = self._http_meta.method.value.lower()
         connection_timeout = CONNECTION_TIMEOUT
@@ -46,8 +47,7 @@ class HttpAttack:
                 connection_timeout += 2
                 print(f"[+] Increasing connection timeout to {connection_timeout} seconds")
             except (requests.ConnectionError, requests.ConnectTimeout):
-                logging.error("Connection error")
-                raise SystemExit
+                raise UserError("Connection error")
 
     def send(self):
         requests_count = 0
