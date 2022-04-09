@@ -15,6 +15,7 @@ class Cli:
     http_schema: Optional[HttpSchemas]
     http_method: Optional[HttpMethods]
     payload: Optional[dict]
+    debug: bool
 
 
 def get_dict_payload(obj: Cli, field: str, name: Optional[str] = None) -> dict:

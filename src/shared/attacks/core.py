@@ -1,6 +1,6 @@
 import socket
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Optional, Protocol, Union
 
 from packets.models import PacketSizes
 from shared.attacks.http import HttpRequestMeta
@@ -19,6 +19,7 @@ class AttackRequest(Model):
     size: PacketSizes = PacketSizes.MEDIUM
     attack_type: AttackTypes = AttackTypes.HTTP
     http_meta: Optional[HttpRequestMeta] = None
+    payload: Optional[Union[dict, list]] = None
 
 
 class Attack(Protocol):

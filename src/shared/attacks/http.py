@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from shared.collections import Enum, Model
 
@@ -20,4 +19,3 @@ class HttpRequestMeta(Model):
     schema: HttpSchemas = HttpSchemas.HTTPS
     method: HttpMethods = HttpMethods.GET
     path: str = "/"
-    payload: Optional[Union[dict, list]] = None

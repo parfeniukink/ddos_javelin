@@ -18,18 +18,24 @@ def main() -> None:
     else:
         http_schema_payload = get_dict_payload(args, "http_schema", "schema")
         http_method_payload = get_dict_payload(args, "http_method", "method")
-        http_data = http_schema_payload | http_method_payload | payload
-        http_meta = HttpRequestMeta(**http_data)
+        http_meta = HttpRequestMeta(**http_schema_payload, **http_method_payload)
 
     attack_request: AttackRequest = AttackRequest(
         target=Target(address=args.address, port=args.port),
         attack_type=args.attack_type,
         http_meta=http_meta,
         **size_payload,
+        **payload,
     )
 
     attack_handler: AttackHandler = AttackHandler(attack_request=attack_request)
-    attack_handler.start()
+
+    print("[+] Attack started")
+    if args.debug:
+        attack_handler.start_debug()
+    else:
+        attack_handler.start()
+    print("[+] Attack is done")
 
 
 if __name__ == "__main__":

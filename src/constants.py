@@ -24,3 +24,6 @@ CRLF = r"\n\r"
 ###########################################
 MIN_PORT_NUMBER = 5
 MAX_PORT_NUMBER = 65535
+
+THREADS_AMOUNT = 10
+CONNECTION_TIMEOUT = 2

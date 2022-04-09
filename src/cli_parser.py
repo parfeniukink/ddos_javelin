@@ -85,6 +85,17 @@ class CliParser:
             ),
         )
 
+        self.parser.add_argument(
+            "--debug",
+            dest="debug",
+            action="store_true",
+            default=False,
+            help=(
+                "Set this flag if you develop something."
+                "It will reduce the amount of used CPUs to 1 and also it will not create any threads"
+            ),
+        )
+
     def _validate_attack_type(self) -> AttackTypes:
         value = self.args.attack_type.upper()
         if value not in self._attack_types:
@@ -157,4 +168,5 @@ class CliParser:
             http_schema=self._validate_http_schema(),
             http_method=self._validate_http_method(),
             payload=self._validate_payload(),
+            debug=self.args.debug,
         )
