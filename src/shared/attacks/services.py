@@ -1,42 +1,11 @@
 import re
 import socket
 from contextlib import contextmanager
-from dataclasses import dataclass
-from typing import Generator, Optional, Protocol, Union
+from typing import Generator, Optional
 
 from constants import IP_REGEX
-from packets.models import PacketSizes
-from shared.attacks.http import HttpRequestMeta
-from shared.attacks.targets import Target
-from shared.collections import Enum, Model
+from shared.attacks.models import AttackRequest, Target
 from shared.errors import UserError
-
-
-class AttackTypes(Enum):
-    HTTP = "HTTP"
-    SYN_FLOOD = "SYN_FLOOD"
-
-
-@dataclass(frozen=True)
-class AttackRequest(Model):
-    target: Target
-    size: PacketSizes = PacketSizes.MEDIUM
-    attack_type: AttackTypes = AttackTypes.HTTP
-    http_meta: Optional[HttpRequestMeta] = None
-    payload: Optional[Union[dict, list]] = None
-
-
-class Attack(Protocol):
-    def __init__(self, attack_request: AttackRequest) -> None:
-        ...
-
-    def run(self) -> None:
-        """Run attack"""
-        ...
-
-    def run_debug(self) -> None:
-        """Run attack in debug mode"""
-        ...
 
 
 class BaseService:

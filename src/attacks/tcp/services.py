@@ -1,8 +1,7 @@
 from random import randint
 
 from scapy.all import IP, TCP, Packet  # type: ignore
-from shared.attacks import AttackRequest
-from shared.attacks.core import BaseService
+from shared.attacks import AttackRequest, BaseService
 from shared.randoms import Random
 
 
