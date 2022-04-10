@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from packets.models import PacketSizes
-from shared.attacks.core import AttackTypes
-from shared.attacks.http import HttpMethods, HttpSchemas
+from shared.attacks import AttackTypes, HttpMethods, HttpSchemas
 
 
 @dataclass

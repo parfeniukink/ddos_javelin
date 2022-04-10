@@ -1,1 +1,2 @@
-from shared.attacks.core import *  # noqa
+from shared.attacks.models import *  # noqa
+from shared.attacks.services import *  # noqa

@@ -1,8 +1,6 @@
 from attacks import AttackHandler
 from cli_parser import CliParser
-from shared.attacks import AttackRequest, AttackTypes
-from shared.attacks.http import HttpRequestMeta
-from shared.attacks.targets import Target
+from shared.attacks import AttackRequest, AttackTypes, HttpRequestMeta, Target
 from shared.cli import Cli, get_dict_payload
 
 
