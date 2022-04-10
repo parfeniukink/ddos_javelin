@@ -10,8 +10,7 @@ from constants import (
     MIN_PORT_NUMBER,
 )
 from packets.models import PacketSizes
-from shared.attacks.core import AttackTypes
-from shared.attacks.http import HttpMethods, HttpSchemas
+from shared.attacks import AttackTypes, HttpMethods, HttpSchemas
 from shared.cli import Cli
 from shared.errors import UserError
 
