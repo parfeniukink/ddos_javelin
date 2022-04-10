@@ -20,6 +20,4 @@ RUN pip install --upgrade pip \
 RUN poetry config virtualenvs.create false \
     && poetry install
 
-COPY ./src ./src
-
-CMD python3 /app/src/run.py 62.173.139.141 443
+COPY ./ ./
