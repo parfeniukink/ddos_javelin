@@ -81,7 +81,9 @@ class CliParser:
             help=(
                 "Custom payload. If not selected use randomly-generated. "
                 "Allowed type is python dictionary. "
-                """Example: '{"username": "admin", "pass": "admin"}'"""
+                'If you want to specify random data for the field use "str" or "int" value'
+                "If you don't specify the payload it will be generated automatically"
+                """Example: '{"username": "admin@email.com", "pass": "str"}'"""
             ),
         )
 
@@ -155,7 +157,11 @@ class CliParser:
         try:
             return json.loads(self.args.payload)
         except json.JSONDecodeError:
-            raise UserError("Can not parse payload data. It shoulf be dict")
+            raise UserError(
+                "Can not parse payload data. It should be dict\n"
+                'If you want to specify random data for the field use "str" or "int" value'
+                "If you don't specify the payload it will be generated automatically"
+            )
 
     def validate_args(self) -> Cli:
         self.args: argparse.Namespace = self.parser.parse_args()

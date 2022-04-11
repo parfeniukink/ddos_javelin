@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from shared.attacks import AttackRequest, BaseService
 from shared.randoms import Random
@@ -34,16 +34,7 @@ class HttpService(BaseService):
 
         return self.__cached_headers
 
-    def _get_http_payload(self, data: Optional[Union[dict, list]]) -> dict:
-        if not data:
-            return {Random.get_random_string(10): Random.get_random_string(20) for _ in range(10)}
-
-        if isinstance(data, dict):
-            return data
-
-        return {field: Random.get_random_string(20) for field in data}
-
-    def get_http_payload(self, data: Optional[Union[dict, list]]) -> dict:
+    def get_http_payload(self, data: Optional[dict]) -> dict:
         """Return random dict payload if received list of fields"""
         self.__duplicates_http_payloads += 1
 
@@ -51,6 +42,6 @@ class HttpService(BaseService):
             self.__cached_http_payload = None
 
         if self.__cached_http_payload is None:
-            self.__cached_http_payload = self._get_http_payload(data)
+            self.__cached_http_payload = super().get_data_payload(data)
 
         return self.__cached_http_payload
