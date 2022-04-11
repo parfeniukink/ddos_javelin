@@ -93,9 +93,14 @@ optional arguments:
 
 
 ## Examples
-```
+<b>Script running examples</b>
+```bash
 src/run.py --attack http --address site.com --port 443 --payload '["search", "category"]'
 src/run.py --attack syn_flood --address site.com
+```
+
+<b>Payload examples:</b>
+```bash
 ```
 
 
