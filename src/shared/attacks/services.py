@@ -1,11 +1,13 @@
 import re
 import socket
 from contextlib import contextmanager
+from random import randint
 from typing import Generator, Optional
 
 from constants import IP_REGEX
 from shared.attacks.models import AttackRequest, Target
 from shared.errors import UserError
+from shared.randoms import Random
 
 
 class BaseService:
@@ -59,3 +61,20 @@ class BaseService:
             print(self._ping_fails, " Fails")
             if self._ping_fails > self.POSSIBLE_PING_FAILS:
                 break
+
+    def get_data_payload(self, data: Optional[dict]) -> dict:
+        """Return dynamic payload based on type. Otherwise generate everything randomly"""
+
+        if not data:
+            return {Random.get_random_string(10): Random.get_random_string(50) for _ in range(10)}
+
+        result = {}
+        for k, v in data.items():
+            if v == "str":
+                result[k] = Random.get_random_string(50)
+            elif v == "int":
+                result[k] = randint(1, 1_000)
+            else:
+                result[k] = data[k]
+
+        return result
