@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Protocol, Union
+from typing import Optional, Protocol
 
 from packets.models import PacketSizes
 from shared.collections import Enum, Model
@@ -48,7 +48,7 @@ class AttackRequest(Model):
     size: PacketSizes = PacketSizes.MEDIUM
     attack_type: AttackTypes = AttackTypes.HTTP
     http_meta: Optional[HttpRequestMeta] = None
-    payload: Optional[Union[dict, list]] = None
+    payload: Optional[dict] = None
 
 
 class Attack(Protocol):
